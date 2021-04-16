@@ -3,44 +3,44 @@ function mensajeAyuda()
 {
     echo "-----------------------------------------------------------------
 Descripcion :
-    Este script recorre todo los itmes publicados por un cliente y devuelve
-    un archivo log con los siguientes campos.
+    Este script recorre todo los itmes publicados por un cliente en el site
+    MLA y devuelve un archivo log con los siguientes campos.
     'id' del item, 'title' del item,'category_id' donde esta publcado,
     'name' de la categoria."
-    echo "------------------------------------------------------------------
+    echo "-----------------------------------------------------------------
 Forma de ejecucion:
-    ./lsitarItems.sh  <id> <site_id>
-    en caso de queres pasar mas id y sitios
-    ./lsitarItems.sh  <id> <site_id> <id> <site_id>" 
+    ./listarItmes.sh  <id>
+    en caso de queres pasar varios id 
+    ./listarItmes.sh  <id> <id>" 
 }
 
 function mensajeError()
 {
     echo "cantidad de parametros erroneos,vea la ayuda
-    ./lsitarItems.sh -h
-    ./lsitarItems.sh -?
-    ./lsitarItems.sh --help"
+    ./listarItmes.sh -h
+    ./listarItmes.sh -?
+    ./listarItmes.sh --help"
 }
 
 
 
 #validacion parametros de entrada
-if [[ $# = 1 && ($1 = "-h" || $1 = "--help" || $1 = "-?") ]]
-then
-    mensajeAyuda
-    exit
-elif [[ $# = 0 || $(($# % 2)) != 0 ]]
+if [[ $# = 0 ]] 
 then
     mensajeError
+    exit
+elif [[ $1 = "-h" || $1 = "--help" || $1 = "-?" ]]
+then
+    mensajeAyuda
     exit
 fi
 
 IFS=' ' read -a variables <<<"$@"
-
-for (( i=0 ; i < $# ; i=i+2))
+SITE_ID="MLA"
+for (( i=0 ; i < $# ; i++))
 do
-    SELLER_ID=${variables[i]}
-    SITE_ID=${variables[i+1]}
+    SELLER_ID="${variables[i]}"
+    
     json="curl -X GET -H 'Authorization: Bearer $ACCESS_TOKEN' https://api.mercadolibre.com/sites/$SITE_ID/search?seller_id=$SELLER_ID" 
 
     atributos=$($json | jq '.results[] | .id, .title, .category_id') 
